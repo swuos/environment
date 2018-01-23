@@ -1,0 +1,46 @@
+version: '2'
+services:
+    nginx:
+        build: ./nginx
+        image: parallel/nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx/mime.types:/etc/nginx/conf/mime.types
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./nginx/virtualhost/:/etc/nginx/virtualhost/
+            - ./logs/:/data0/www/logs
+            - /Users/yanxingmao/WorkSpace/swuos/:/data0/www/htdocs/
+        depends_on:
+            - phpfpm
+    phpfpm:
+        build: ./phpfpm
+        image: parallel/phpfpm
+        ports:
+            - "9000:9000"
+        volumes:
+            - /Users/yanxingmao/WorkSpace/swuos/:/data0/www/htdocs/
+            - ./applogs/:/data0/www/applogs/
+            - ./phpfpm/yaf.ini:/usr/local/etc/php/conf.d/yaf.ini
+            - ./phpfpm/php-core.ini://usr/local/etc/php/conf.d/php-core.ini
+        depends_on:
+            - mysql
+            - redis
+    mysql:
+        build: ./mysql
+        image: parallel/mysql
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./mysql/conf.d:/etc/mysqld/conf.d
+            - ./mysql/data/:/var/lib/mysql/
+            - ./logs/:/data0/www/logs
+        environment:
+            MYSQL_ROOT_PASSWORD: 123456
+    redis:
+        build: ./redis
+        image: parallel/redis
+        volumes:
+            - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+            - ./logs/:/data0/www/logs
+            - ./redis/data/:/data0/www/pridata/redis/
