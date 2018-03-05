@@ -12,4 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install pdo_mysql
 
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 RUN pecl install yaf
